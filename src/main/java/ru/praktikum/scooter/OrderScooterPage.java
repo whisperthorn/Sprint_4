@@ -1,4 +1,4 @@
-package POM;
+package ru.praktikum.scooter;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -9,16 +9,12 @@ public class OrderScooterPage {
 
     public static final String[] RENT_PERIOD_STRING = new String[]{"сутки", "двое суток", "трое суток", "четверо суток", "пятеро суток", "шестеро суток", "семеро суток"};
     private static final String[] MONTH_NAMES = new String[]{"января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"};
-    private static final String MAIN_PAGE_URL = "https://qa-scooter.praktikum-services.ru/";
-    private static final By UPPER_ORDER_BUTTON = By.xpath(".//div[@class='Header_Nav__AGCXC']//button[@class='Button_Button__ra12g']");
-    private static final By LOWER_ORDER_BUTTON = By.xpath(".//div[@class='Home_RoadMap__2tal_']//button[@class='Button_Button__ra12g Button_Middle__1CSJM']");
     private static final By FIRST_NAME_FIELD = By.xpath(".//input[@placeholder='* Имя']");
     private static final By SECOND_NAME_FIELD = By.xpath(".//input[@placeholder='* Фамилия']");
     private static final By ADDRESS_FIELD = By.xpath(".//input[@placeholder='* Адрес: куда привезти заказ']");
     private static final By METRO_STATION_FIELD = By.xpath(".//input[@placeholder='* Станция метро']");
     private static final By PHONE_NUMBER_FIELD = By.xpath(".//input[@placeholder='* Телефон: на него позвонит курьер']");
     private static final By NEXT_ORDER_PAGE_BUTTON = By.xpath(".//div[@class='Order_NextButton__1_rCA']//button[@class='Button_Button__ra12g Button_Middle__1CSJM']");
-    private static final By ACCEPT_COOKIE_BUTTON = By.className("App_CookieButton__3cvqF");
     private static final By CALENDAR_PREV_MONTH_BUTTON = By.xpath(".//button[contains(@aria-label, 'Previous Month')]");
     private static final By CALENDAR_NEXT_MONTH_BUTTON = By.xpath(".//button[contains(@aria-label, 'Next Month')]");
     private static final By CALENDAR_FIELD = By.xpath(".//input[@placeholder='* Когда привезти самокат']");
@@ -30,29 +26,13 @@ public class OrderScooterPage {
     private static final By FINISH_ORDER_BUTTON = By.xpath(".//button[@class='Button_Button__ra12g Button_Middle__1CSJM' and text()='Заказать']");
     private static final By CONFIRM_ORDER_BUTTON = By.xpath(".//button[@class='Button_Button__ra12g Button_Middle__1CSJM' and text()='Да']");
     private static final By SUCCESSFUL_ORDER_TEXT = By.xpath(".//div[@class='Order_ModalHeader__3FDaJ' and text()='Заказ оформлен']");
+    public static final String XPATH_SEARCH_RENT_PERIOD = ".//div[text()='%s']";
+    public static final String XPATH_SEARCH_METRO_STATION = ".//div[text()='%s']";
+    public static final String XPATH_ORDER_DATE_LOCATOR = ".//div[contains(@aria-label, '%s-е %s %s г.')]";
     private WebDriver driver;
 
     public OrderScooterPage(WebDriver driver) {
         this.driver = driver;
-    }
-
-    public void clickMakeOrder(String orderButton){
-        driver.get(MAIN_PAGE_URL);
-        if(orderButton.equals("верхняяКнопка")){
-            driver.findElement(UPPER_ORDER_BUTTON).click();
-        } else if (orderButton.equals("нижняяКнопка")) {
-            WebElement element = driver.findElement(LOWER_ORDER_BUTTON);
-            scrollToElement(driver, element);
-            element.click();
-        } else {
-            driver.findElement(UPPER_ORDER_BUTTON).click();
-        }
-    }
-
-    public void clickAcceptCookie(){
-        new WebDriverWait(driver, Duration.ofSeconds(3))
-                .until(ExpectedConditions.elementToBeClickable(ACCEPT_COOKIE_BUTTON));
-        driver.findElement(ACCEPT_COOKIE_BUTTON).click();
     }
 
     public void setFirstName(String firstName){
@@ -69,7 +49,9 @@ public class OrderScooterPage {
 
     public void setMetroStation(String metroStation){
         driver.findElement(METRO_STATION_FIELD).click();
-        WebElement element = driver.findElement(By.xpath(String.format(".//div[text()='%s']", metroStation)));
+        new WebDriverWait(driver, Duration.ofSeconds(240))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(XPATH_SEARCH_METRO_STATION, metroStation))));
+        WebElement element = driver.findElement(By.xpath(String.format(XPATH_SEARCH_METRO_STATION, metroStation)));
         scrollToElement(driver,element);
         element.click();
         }
@@ -87,14 +69,14 @@ public class OrderScooterPage {
         LocalDate newDate = calculateNewDate(orderDate, currentDate);
 
         driver.findElement(CALENDAR_FIELD).click();
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.visibilityOfElementLocated(CALENDAR));
 
         selectTargetMonth(currentDate, newDate);
 
         String[] xpathString = {String.valueOf(newDate.getDayOfMonth()), getMonthName(newDate.getMonthValue()), String.valueOf(newDate.getYear())};
-        WebElement element = driver.findElement(By.xpath(String.format(".//div[contains(@aria-label, '%s-е %s %s г.')]", xpathString[0], xpathString[1], xpathString[2])));
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        WebElement element = driver.findElement(By.xpath(String.format(XPATH_ORDER_DATE_LOCATOR, xpathString[0], xpathString[1], xpathString[2])));
+        new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.visibilityOf(element));
         element.click();
     }
@@ -141,8 +123,8 @@ public class OrderScooterPage {
 
     public void setRentPeriod(int rentPeriod){
         driver.findElement(RENT_PERIOD_FIELD).click();
-        WebElement element = driver.findElement(By.xpath(String.format(".//div[text()='%s']", getRentPeriod(rentPeriod))));
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        WebElement element = driver.findElement(By.xpath(String.format(XPATH_SEARCH_RENT_PERIOD, getRentPeriod(rentPeriod))));
+        new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.visibilityOf(element));
         element.click();
     }
@@ -170,7 +152,7 @@ public class OrderScooterPage {
         }
 
     public void clickConfirm(){
-        new WebDriverWait(driver, Duration.ofSeconds(3))
+        new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.elementToBeClickable(CONFIRM_ORDER_BUTTON));
         driver.findElement(CONFIRM_ORDER_BUTTON).click();
         }

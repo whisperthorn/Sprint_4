@@ -1,4 +1,4 @@
-import POM.MainPage;
+import ru.praktikum.scooter.MainPage;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -7,6 +7,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+
+import java.time.Duration;
 
 @RunWith(Parameterized.class)
 public class QATextTest {
@@ -36,10 +38,12 @@ public class QATextTest {
     @Before
     public void before() {
         driver = new FirefoxDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
     }
 
+
     @Test
-    public void checkAnswerText() {
+    public void testAnswerText() {
         MainPage objMainPage = new MainPage(driver);
         objMainPage.clickQuestion(questionHeader);
         Assert.assertTrue("Текст ответа не найден", objMainPage.isAnswerFound(questionAnswer));

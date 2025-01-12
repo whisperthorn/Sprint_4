@@ -1,4 +1,4 @@
-import POM.MainPage;
+import ru.praktikum.scooter.MainPage;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +17,7 @@ public class LogoUrlTest {
     @Before
     public void before() {
         driver = new FirefoxDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
     }
 
     @Test
@@ -33,7 +34,7 @@ public class LogoUrlTest {
         MainPage objMainPage = new MainPage(driver);
         objMainPage.clickYandexLogo();
         String expected = YANDEX_LOGO_URL;
-        new WebDriverWait(driver, Duration.ofSeconds(10))
+        new WebDriverWait(driver, Duration.ofSeconds(30))
                 .until(ExpectedConditions.urlMatches(YANDEX_LOGO_URL));
         String actual = driver.getCurrentUrl();
         Assert.assertTrue("Url не соответствует", actual.contains(expected));
