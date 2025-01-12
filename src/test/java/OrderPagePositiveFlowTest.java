@@ -1,4 +1,6 @@
-import POM.OrderScooterPage;
+import org.openqa.selenium.chrome.ChromeDriver;
+import ru.praktikum.scooter.MainPage;
+import ru.praktikum.scooter.OrderScooterPage;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -6,7 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.time.Duration;
 
 @RunWith(Parameterized.class)
 public class OrderPagePositiveFlowTest {
@@ -50,13 +53,15 @@ public class OrderPagePositiveFlowTest {
     @Before
     public void before() {
         driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
     }
 
     @Test
-    public void makeOrder() {
+    public void testMakeOrder() {
         OrderScooterPage objOrderPage = new OrderScooterPage(driver);
-        objOrderPage.clickMakeOrder(orderButton);
-        objOrderPage.clickAcceptCookie();
+        MainPage objMainpage = new MainPage(driver);
+        objMainpage.clickAcceptCookie();
+        objMainpage.clickMakeOrder(orderButton);
         objOrderPage.setOrderFirstPage(firstName, secondName, address, metroStation, phoneNumber);
         objOrderPage.setOrderSecondPage(orderDate, rentPeriod, scooterColour, commentary);
         objOrderPage.clickConfirm();
