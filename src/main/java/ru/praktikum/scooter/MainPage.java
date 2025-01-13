@@ -26,8 +26,12 @@ public class MainPage {
 
     public void clickQuestion(String questionHeader){
         driver.get(MAIN_PAGE_URL);
+        new WebDriverWait(driver, Duration.ofSeconds(240))
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath(String.format(XPATH_SEARCH_TEXT_HEADER, questionHeader))));
         WebElement element = driver.findElement(By.xpath(String.format(XPATH_SEARCH_TEXT_HEADER, questionHeader)));
         scrollToElement(driver, element);
+        new WebDriverWait(driver, Duration.ofSeconds(120))
+                .until(ExpectedConditions.elementToBeClickable(element));
         element.click();
     }
 
